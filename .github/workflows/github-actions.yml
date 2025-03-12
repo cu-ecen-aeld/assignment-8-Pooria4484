@@ -7,32 +7,29 @@ on:
             - '*'
 jobs:
   full-test:
-    runs-on: self-hosted # باید runner خودتون رو تنظیم کرده باشید
+    runs-on: self-hosted  # باید runner روی سیستم شما تنظیم شده باشد
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
           clean: false
           submodules: 'recursive'
-      
-      - uses: webfactory/ssh-agent@v0.5.4
+
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.5.4
         with:
           ssh-private-key: ${{ secrets.SSH_PRIV_KEY }}
 
-      - name: Run build
-        timeout-minutes: 600
+      - name: Run full test
+        timeout-minutes: 15
         run: |
-          # حذف دستورات Docker و اجرای مستقیم
-          export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
-          cd ${GITHUB_WORKSPACE}
-          # ./build.sh
+          # تغییر مسیر به دایرکتوری پروژه
+          cd /home/pooria/colorado/assignment-6-yocto
+
+          # اجرای اسکریپت تست
+          ./full-test.sh
 
       - name: Cleanup
         if: always()
         run: |
           ssh-add -D
-
-      - name: Run full test
-        timeout-minutes: 15
-        run: |
-          cd ${GITHUB_WORKSPACE}
-          ./full-test.sh
