@@ -24,7 +24,7 @@ jobs:
           # حذف دستورات Docker و اجرای مستقیم
           export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
           cd ${GITHUB_WORKSPACE}
-          ./build.sh
+          # ./build.sh
 
       - name: Cleanup
         if: always()
