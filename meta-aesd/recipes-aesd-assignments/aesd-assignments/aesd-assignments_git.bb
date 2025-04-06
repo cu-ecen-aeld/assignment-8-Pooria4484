@@ -2,41 +2,40 @@
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
-# TODO: Set this  with the path to your assignments rep.  Use ssh protocol and see lecture notes
-# about how to setup ssh-agent for passwordless access
-# SRC_URI = "git://git@github.com/cu-ecen-aeld/<your assignments repo>;protocol=ssh;branch=master"
+# Set your assignments repository URL using SSH protocol
+# Configure SSH keys for passwordless access as shown in lecture notes
+SRC_URI = "git://git@github.com/cu-ecen-aeld/assignment-6-Pooria4484.git;protocol=ssh;branch=main"
 
 PV = "1.0+git${SRCPV}"
-# TODO: set to reference a specific commit hash in your assignment repo
-#SRCREV = "f99b82a5d4cb2a22810104f89d4126f52f4dfaba"
+# Replace with your specific commit hash from the assignment repo
+SRCREV = "fa7023c33d5c0ea84653270eee0af22dc28c3689"
 
-# This sets your staging directory based on WORKDIR, where WORKDIR is defined at 
-# https://docs.yoctoproject.org/ref-manual/variables.html?highlight=workdir#term-WORKDIR
-# We reference the "server" directory here to build from the "server" directory
-# in your assignments repo
+# Set working directory to the server subdirectory of the repository
 S = "${WORKDIR}/git/server"
 
-# TODO: Add the aesdsocket application and any other files you need to install
-# See https://git.yoctoproject.org/poky/plain/meta/conf/bitbake.conf?h=kirkstone
-#FILES:${PN} += "${bindir}/aesdsocket"
-# TODO: customize these as necessary for any libraries you need for your application
-# (and remove comment)
-#TARGET_LDFLAGS += "-pthread -lrt"
+# Specify files to install in the package
+FILES:${PN} += "${bindir}/aesdsocket"
+# Add required library linkages for the application
+TARGET_LDFLAGS += "-pthread -lrt"
 
 do_configure () {
-	:
+    # No specific configuration required
+    :
 }
 
 do_compile () {
-	oe_runmake
+    # Build the application using the provided Makefile
+    oe_runmake
 }
 
 do_install () {
-	# TODO: Install your binaries/scripts here.
-	# Be sure to install the target directory with install -d first
-	# Yocto variables ${D} and ${S} are useful here, which you can read about at 
-	# https://docs.yoctoproject.org/ref-manual/variables.html?highlight=workdir#term-D
-	# and
-	# https://docs.yoctoproject.org/ref-manual/variables.html?highlight=workdir#term-S
-	# See example at https://github.com/cu-ecen-aeld/ecen5013-yocto/blob/ecen5013-hello-world/meta-ecen5013/recipes-ecen5013/ecen5013-hello-world/ecen5013-hello-world_git.bb
+    # Create installation directory
+    install -d ${D}${bindir}
+    
+    # Install the aesdsocket binary with executable permissions
+    install -m 0755 ${S}/aesdsocket ${D}${bindir}/
+    
+    # Uncomment and modify if you have additional files like systemd service
+    # install -d ${D}${systemd_system_unitdir}
+    # install -m 0644 ${S}/aesdsocket.service ${D}${systemd_system_unitdir}/
 }
