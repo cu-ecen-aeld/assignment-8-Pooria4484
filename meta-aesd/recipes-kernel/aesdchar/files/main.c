@@ -177,6 +177,49 @@ out:
     return retval;
 }
 
+loff_t aesd_llseek(struct file *filp, loff_t offset, int whence)
+{
+    struct aesd_dev *dev = &aesd_device;
+    loff_t new_pos = -1;
+    loff_t total_size = 0;
+    uint8_t i;
+    struct aesd_buffer_entry *entry;
+
+    mutex_lock(&dev->lock);
+
+    AESD_CIRCULAR_BUFFER_FOREACH(entry, &dev->buffer, i) {
+        if (entry->buffptr != NULL) {
+            total_size += entry->size;
+        }
+    }
+
+    switch (whence) {
+        case SEEK_SET:
+            if (offset >= 0 && offset <= total_size)
+                new_pos = offset;
+            break;
+
+        case SEEK_CUR:
+            if ((filp->f_pos + offset >= 0) && (filp->f_pos + offset <= total_size))
+                new_pos = filp->f_pos + offset;
+            break;
+
+        case SEEK_END:
+            if ((total_size + offset >= 0) && (total_size + offset <= total_size))
+                new_pos = total_size + offset;
+            break;
+
+        default:
+            new_pos = -EINVAL;
+            break;
+    }
+
+    if (new_pos >= 0)
+        filp->f_pos = new_pos;
+
+    mutex_unlock(&dev->lock);
+    return new_pos;
+}
 
 
 
@@ -187,6 +230,7 @@ struct file_operations aesd_fops = {
     .write =    aesd_write,
     .open =     aesd_open,
     .release =  aesd_release,
+    .llseek =   aesd_llseek,
 };
 
 static int aesd_setup_cdev(struct aesd_dev *dev)
