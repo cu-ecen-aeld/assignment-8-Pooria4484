@@ -18,3 +18,5 @@ do_copy_overlay() {
 
 ROOTFS_POSTPROCESS_COMMAND += "do_copy_overlay; "
 IMAGE_INSTALL:append = " scull"
+IMAGE_INSTALL += "aesdchar"
+IMAGE_INSTALL:append = " aesdsocket"

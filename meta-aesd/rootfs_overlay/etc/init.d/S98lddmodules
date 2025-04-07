@@ -15,12 +15,14 @@ case "$1" in
         /sbin/insmod /lib/modules/$(uname -r)/extra/hello.ko
         /sbin/insmod /lib/modules/$(uname -r)/extra/faulty.ko
         /sbin/insmod /lib/modules/$(uname -r)/extra/scull.ko
+        echo "Inserting aesdchar module..."
+        insmod /lib/modules/$(uname -r)/extra/aesdchar.ko
         ;;
     stop)
         echo "Unloading ldd kernel modules..."
         /sbin/rmmod faulty
         /sbin/rmmod hello
-        /sbin/rmmod scull
+        /sbin/rmmod aesdchar
         ;;
     restart)
         $0 stop
