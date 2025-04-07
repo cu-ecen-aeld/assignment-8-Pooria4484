@@ -6,30 +6,21 @@ on:
         branches:
             - '*'
 jobs:
-  full-test:
-    runs-on: self-hosted  # باید runner روی سیستم شما تنظیم شده باشد
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          clean: false
-          submodules: 'recursive'
-
-      - name: Setup SSH agent
-        uses: webfactory/ssh-agent@v0.5.4
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIV_KEY }}
-
-      - name: Run full test
-        timeout-minutes: 15
-        run: |
-          # تغییر مسیر به دایرکتوری پروژه
-          cd /home/pooria/colorado/assignment-6-yocto
-
-          # اجرای اسکریپت تست
-          ./full-test.sh
-
-      - name: Cleanup
-        if: always()
-        run: |
-          ssh-add -D
+    unit-test:
+        container: cuaesd/aesd-autotest:24-unit-test
+        runs-on: self-hosted
+        steps:
+          - uses: actions/checkout@v2
+          - name: Checkout submodules
+            run : git submodule update --init --recursive
+          - name: Run unit test
+            run: ./unit-test.sh
+    full-test:
+        container: cuaesd/aesd-autotest:24-assignment7
+        runs-on: self-hosted
+        steps:
+          - uses: actions/checkout@v2
+          - name: Checkout submodules
+            run : git submodule update --init --recursive
+          - name: Run full test
+            run: ./full-test.sh
